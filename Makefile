@@ -1,6 +1,6 @@
 COMPILER= clang-5.0
 OUTPUTEXEC= orbisFixElf
-SOURCE_FILES= main.c myelf.c
+SOURCE_FILES= main.c myelf.c toolbox.c
 CFLAGS= -o
 
 all: 

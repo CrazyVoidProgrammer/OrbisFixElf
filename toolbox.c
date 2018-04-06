@@ -5,6 +5,16 @@
 #include "toolbox.h"
 #include "myelf.h"
 
+/*
+char *read_section(FILE *fp, OrbisSection sec)
+{
+	char *buff = malloc(sec.size);
+	lseek(fp, (off_t)sec.offset, SEEK_SET);
+	read(fp, buff, sec.size);
+	return buff;
+}
+*/
+
 // Not Tested- writting loose code for later
 void write_section_data(OrbisSection *sec, FILE *exportElf)
 {

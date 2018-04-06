@@ -230,7 +230,8 @@ typedef struct OrbisSection {
 
 typedef struct OpenElf {
 	char *buffer;
-	OrbisElfHeader_t *header;
+	OrbisElfHeader_t header;
+	OrbisElfProgramHeader_t pheader;
 	customStub stubs[];
 } OpenElf;
 
@@ -238,7 +239,8 @@ typedef struct OpenElf {
 typedef struct
 {
 	char *buffer;
-	OrbisElfHeader_t *header;
+	OrbisElfHeader_t header;
+	OrbisElfProgramHeader_t pheader;
 	// Orbis Custom Sections
 	orbis_special *special;
 	orbis_process_param *process_param;
@@ -246,10 +248,12 @@ typedef struct
 	int errorCode;
 } OrbisElf;
 
-
 // Functions
 
-OrbisElf loadElf(char *path);
-void orbisParseHeader(OrbisElf *inputElf);
+void verboseElf(OpenElf inputElf);
+
+int verifyElf(OpenElf *inputElf);
+
+OpenElf loadElf(char *elfPath);
 
 #endif

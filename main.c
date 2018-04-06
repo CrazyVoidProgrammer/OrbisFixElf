@@ -48,22 +48,23 @@ int main(int argc, char **argv)
 		
 	if(argc == 3)
 	{
+	
+
+		OpenElf importElf;
+		
+		printf("[INFO] Loading : %s\n", argv[1]);
 		
 		importElf = loadElf(argv[1]);
-		orbisParseHeader(&importElf);
-		// Copy the rest of the sections
 		
-		if(importElf.errorCode == 0)
+		if(verifyElf(&importElf) == 1) 
 		{
-			// Now patch all the sections of OrbisElf importElf
-			// Copy importElf patched sections to exportElf in the right order
-			// Save exportElf as argv[2]
+			printf("[INFO] %s ELF Magic Check Passed!\n", argv[1]);
 			
-			printf("Exporting Patched Elf : %s\n", argv[2]);
-		}
+			verboseElf(importElf);
+		} 
 		else
 		{
-			printf("ELF Error Code : %i \n\n", importElf.errorCode);
+			printf("Elf Magic Check Failed!\n");
 			appReturn = -1;
 		}
 		
@@ -71,6 +72,9 @@ int main(int argc, char **argv)
 	}
 	else
 	{
+		printf("ARG DUMP\n================================\n");
+		dump_args(argc, argv);
+		printf("================================\n\n");
 		print_help_section();
 	}
 
