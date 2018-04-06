@@ -186,13 +186,56 @@ typedef struct OrbisElfRebase_s
 	uint32_t symbolIndex;
 } OrbisElfRebase_t;
 
-// By CrazyVoid
+// Orbis Reversed Sections 
+
+typedef struct orbis_special {
+	void *test;
+} orbis_special;
+
+typedef struct orbis_process_param {
+	uint64_t unknown_01;
+	uint64_t pad_01;
+	uint64_t process_name;
+	uint64_t flag;
+	uint64_t sdk_version;
+	uint64_t pad_02[11];
+} orbis_process_param;
+
+typedef struct orbis_version {
+	void *test;
+} orbis_version;
+
+// Open Source SDK Stubs
+
+typedef struct customStubFunctions {
+	char *name;
+	char *nid;
+} customStubFunctions;
+
+typedef struct customStub {
+	char *Module;
+	customStubFunctions functions[];
+} customStub;
+
+
+typedef struct OpenElf {
+	char *buffer;
+	OrbisElfHeader_t *header;
+	customStub stubs[];
+} OpenElf;
+
+// Add all sections to this
 typedef struct
 {
 	char *buffer;
 	OrbisElfHeader_t *header;
+	// Orbis Custom Sections
+	orbis_special *special;
+	orbis_process_param *process_param;
+	orbis_version *version;
 	int errorCode;
 } OrbisElf;
+
 
 // Functions
 
