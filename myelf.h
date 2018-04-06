@@ -217,6 +217,16 @@ typedef struct customStub {
 	customStubFunctions functions[];
 } customStub;
 
+// Section Structs
+
+typedef struct OrbisSection {
+	char *name;
+	uint64_t offset;
+	char *data;
+	long dataSize;
+	char *type;
+	int alignment;
+} OrbisSection;
 
 typedef struct OpenElf {
 	char *buffer;
