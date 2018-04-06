@@ -9,50 +9,6 @@
  *		Kiwidog ( for advice and pointers )
  *		Frangarcj ( for advice and pointers )
  *	--------------------------------------------------------------------
- 
- quu..__
- $$$b  `---.__
-  "$$b        `--.                          ___.---uuudP
-   `$$b           `.__.------.__     __.---'      $$$$"              .
-     "$b          -'            `-.-'            $$$"              .'|
-       ".                                       d$"             _.'  |
-         `.   /                              ..."             .'     |
-           `./                           ..::-'            _.'       |
-            /                         .:::-'            .-'         .'
-           :                          ::''\          _.'            |
-          .' .-.             .-.           `.      .'               |
-          : /'$$|           .@"$\           `.   .'              _.-'
-         .'|$u$$|          |$$,$$|           |  <            _.-'
-         | `:$$:'          :$$$$$:           `.  `.       .-'
-         :                  `"--'             |    `-.     \
-        :##.       ==             .###.       `.      `.    `\
-        |##:                      :###:        |        >     >
-        |#'     `..'`..'          `###'        x:      /     /
-         \                                   xXX|     /    ./
-          \                                xXXX'|    /   ./
-          /`-.                                  `.  /   /
-         :    `-  ...........,                   | /  .'
-         |         ``:::::::'       .            |<    `.
-         |             ```          |           x| \ `.:``.
-         |                         .'    /'   xXX|  `:`M`M':.
-         |    |                    ;    /:' xXXX'|  -'MMMMM:'
-         `.  .'                   :    /:'       |-'MMMM.-'
-          |  |                   .'   /'        .'MMM.-'
-          `'`'                   :  ,'          |MMM<
-            |                     `'            |tbap\
-             \                                  :MM.-'
-              \                 |              .''
-               \.               `.            /
-                /     .:::::::.. :           /
-               |     .:::::::::::`.         /
-               |   .:::------------\       /
-              /   .''               >::'  /
-              `',:                 :    .'
-                 
-			ENJOY THIS FREE TOOL, IF YOU PAID FOR
-			ANYTHING IN THIS SDK, ASK FOR YOUR 
-			MONEY BACK BECAUSE YOU HAVE BEEN RIPPED
-			OFF BUDDY!
  */
 
  
@@ -68,29 +24,7 @@
 #include "myelf.h"
 
 int appReturn = 0;
-FILE *input_elf_fh, *output_elf_fh;
-char *input_elf_buffer;
-
-OrbisElf importElf, *exportElf;
-
-int orbis_load_elf(char *path)
-{
-
-	return 0;
-}
-
-int orbis_parse_header()
-{
-
-	return 0;
-}
-
-int orbis_elf_rewrite_stubs()
-{
-	
-	
-	return 0;
-}
+OrbisElf importElf, exportElf;
 
 void print_help_section()
 {
@@ -117,11 +51,15 @@ int main(int argc, char **argv)
 		
 		importElf = loadElf(argv[1]);
 		orbisParseHeader(&importElf);
-		
+		// Copy the rest of the sections
 		
 		if(importElf.errorCode == 0)
 		{
+			// Now patch all the sections of OrbisElf importElf
+			// Copy importElf patched sections to exportElf in the right order
+			// Save exportElf as argv[2]
 			
+			printf("Exporting Patched Elf : %s\n", argv[2]);
 		}
 		else
 		{

@@ -197,6 +197,6 @@ typedef struct
 // Functions
 
 OrbisElf loadElf(char *path);
-int orbisParseHeader(OrbisElf *inputElf);
+void orbisParseHeader(OrbisElf *inputElf);
 
 #endif
