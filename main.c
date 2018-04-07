@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 		{
 			printf("[INFO] %s ELF Magic Check Passed!\n", argv[1]);
 			
-			verboseElf(importElf);
+			//verboseElf(importElf);
 		} 
 		else
 		{

@@ -192,14 +192,23 @@ typedef struct orbis_special {
 	void *test;
 } orbis_special;
 
-typedef struct orbis_process_param {
-	uint64_t unknown_01;
-	uint64_t pad_01;
-	uint64_t process_name;
-	uint64_t flag;
-	uint64_t sdk_version;
-	uint64_t pad_02[11];
-} orbis_process_param;
+// Orbis Process Param aka sce_process_param
+// Things need more reversing to figure out how this data is used.
+struct orbis_process_param
+{
+    uint64_t Size;
+    union
+    {
+        uint32_t Magic;
+        char MagicBits[4];
+    };
+    uint32_t ThingCount;    // 1
+    uint16_t SDK_Build;         // SDK Build Version : 0x0000
+    uint8_t SDK_Minor;          // SDK Minor Version : 0x00
+    uint8_t SDK Major;          // SDK Major Version : 0x01
+    uint8_t Unknown[36];	// Most likely just padding...
+    uint64_t Things[];       // Things[ThingCount]; (gta is 0) but normally 2
+};
 
 typedef struct orbis_version {
 	void *test;

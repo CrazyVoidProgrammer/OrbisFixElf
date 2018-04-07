@@ -11,12 +11,43 @@ OpenElf loadElf(char *elfPath)
 	OpenElf returnElf;
 	
 	OrbisElfHeader_t myHeader;
-	OrbisElfProgramHeader_t myPHeader;
+	OrbisElfSectionHeader_t sectHdr;
+	OrbisElfProgramHeader_t progHdr;
 	
+	char *sectionNames = NULL;
+	int idx;
+	
+	// Open Input Elf
 	FILE *fp = fopen(elfPath, "rb");
+	// Read Elf Header into struct
 	fread(&myHeader, sizeof(myHeader), 1, fp);
-	fseek(fp, myHeader.phoff, SEEK_SET);
-	fread(&myPHeader, sizeof(myPHeader), 1, fp);
+	
+	
+	// Lets read our section header
+	fseek(fp, myHeader.shoff + myHeader.shstrndx * sizeof(sectHdr), SEEK_SET);
+	fread(&sectHdr, 1, sizeof(sectHdr), fp);
+	//printf("Section Header offset : 0x%lu\n", sectHdr.offset);
+	
+	// Lets copy the section names over to char array
+	sectionNames = malloc(sectHdr.size);
+	fseek(fp, sectHdr.offset, SEEK_SET);
+	fread(sectionNames, 1, sectHdr.size, fp);
+	
+	// Loop for sections
+	for(idx = 0; idx < myHeader.shnum; idx++)
+	{
+		const char *name = "";
+		// Copy Sections in to Section Struct
+		fseek(fp, myHeader.shoff + idx * sizeof(sectHdr), SEEK_SET);
+		fread(&sectHdr, 1, sizeof(sectHdr), fp);
+		if(sectHdr.name)
+		{
+				name = sectionNames + sectHdr.name;
+		}
+		
+		printf("Elf [%d] Section : %s\n", idx, name);
+	}
+	
 	
 	// Keep a copy of the original elf
 	fseek(fp, 0, SEEK_END);
@@ -26,10 +57,11 @@ OpenElf loadElf(char *elfPath)
 	returnElf.buffer = malloc(elfSize + 1);
 	fread(returnElf.buffer, elfSize, 1, fp);
 	
+	
 	fclose(fp);
 	
 	returnElf.header = myHeader;
-	returnElf.pheader = myPHeader;
+	//returnElf.pheader = myPHeader;
 	
 	
 	return returnElf;
