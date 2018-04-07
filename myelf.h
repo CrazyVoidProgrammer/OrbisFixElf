@@ -56,6 +56,11 @@
 #define DT_SCE_HASHSZ				0x6100003d	// DATA : 0x30
 #define DT_SCE_SYMTABSZ				0x6100003f	// DATA : 0xc0
 
+// MAGICS
+
+#define SCEPROCPARAMS_MAGIC 0x4942524F // 'ORBI'
+
+
 typedef struct OrbisElf_s *OrbisElfHandle_t;
 typedef struct OrbisElfProgram_s *OrbisElfProgramHandle_t;
 typedef struct OrbisElfSection_s *OrbisElfSectionHandle_t;
