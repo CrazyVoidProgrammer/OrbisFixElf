@@ -215,6 +215,19 @@ struct orbis_process_param
     uint64_t Things[];       // Things[ThingCount]; (gta is 0) but normally 2
 };
 
+struct orbis_comment_entry
+{
+    uint32_t Length; // Length of string with null term
+    char* Data; // Bytes with null term
+};
+
+struct orbis_comment
+{
+    uint32_t PathMagic;
+    uint32_t EntrySize; // Total entry size with padding to 4 byte alignment
+    struct orbis_comment_entry Entry;
+};
+
 typedef struct orbis_version {
 	void *test;
 } orbis_version;
