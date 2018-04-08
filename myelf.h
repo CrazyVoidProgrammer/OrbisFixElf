@@ -228,6 +228,47 @@ struct orbis_comment
     struct orbis_comment_entry Entry;
 };
 
+struct dynlibHeader
+{
+	uint64_t unknown_header_section_01;
+	uint64_t unknown_header_section_02;
+	uint32_t unknown_header_section_03;
+}
+
+struct prxFiles
+{
+	char *prxFileName; // example : libc.prx libkernel.prx
+	uint8_t pad; // example : 0x00 (1 byte)
+};
+
+struct moduleName
+{
+	char *moduleName; // example : libc libkernel
+	uint8_t pad; // example : 0x00 (1 byte)
+}
+
+struct nidEntry
+{
+	char nid[11]
+	char moduleIndex[4];
+	char pad; // 0x00 - 1 byte
+};
+
+typedef struct orbis_dynlib {
+
+	dynlibHeader header;
+	
+	prxFiles prxFileList[];
+	moduleName moduleNameList[];	
+
+	char *elfBuildPath; // original build path of elf
+	uint8_t pad_01; // 1 byte of 0x00 padding	
+
+	nidEntry nidEntryList[];
+
+} orbis_dynlib;
+
+
 typedef struct orbis_version {
 	void *test;
 } orbis_version;
