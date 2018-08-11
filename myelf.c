@@ -23,6 +23,13 @@ OpenElf loadElf(char *elfPath)
 	fread(&myHeader, sizeof(myHeader), 1, fp);
 	
 	
+	// Lets read our program header
+	printf("PH Offset : 0x%lu\n", myHeader.phoff);
+	printf("PH Size : 0x%lu (Bytes) \n", sizeof(progHdr));
+	fseek(fp, myHeader.phoff, sizeof(progHdr));
+	fread(&progHdr, 1, sizeof(progHdr), fp);
+	printf("Program Header vaddr : 0x%lu\n", progHdr.filesz);
+	
 	// Lets read our section header
 	fseek(fp, myHeader.shoff + myHeader.shstrndx * sizeof(sectHdr), SEEK_SET);
 	fread(&sectHdr, 1, sizeof(sectHdr), fp);
