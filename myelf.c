@@ -3,78 +3,15 @@
 #include <stdint.h>
 #include <string.h>
 #include <elf.h>
+#include <gelf.h>
 
+#include "varray.h"
+#include "toolbox.h"
 #include "myelf.h"
 
-OpenElf loadElf(char *elfPath)
-{
-	OpenElf returnElf;
-	
-	OrbisElfHeader_t myHeader;
-	OrbisElfSectionHeader_t sectHdr;
-	OrbisElfProgramHeader_t progHdr;
-	
-	char *sectionNames = NULL;
-	int idx;
-	
-	// Open Input Elf
-	FILE *fp = fopen(elfPath, "rb");
-	// Read Elf Header into struct
-	fread(&myHeader, sizeof(myHeader), 1, fp);
-	
-	
-	// Lets read our program header
-	printf("PH Offset : 0x%lu\n", myHeader.phoff);
-	printf("PH Size : 0x%lu (Bytes) \n", sizeof(progHdr));
-	fseek(fp, myHeader.phoff, sizeof(progHdr));
-	fread(&progHdr, 1, sizeof(progHdr), fp);
-	printf("Program Header vaddr : 0x%lu\n", progHdr.filesz);
-	
-	// Lets read our section header
-	fseek(fp, myHeader.shoff + myHeader.shstrndx * sizeof(sectHdr), SEEK_SET);
-	fread(&sectHdr, 1, sizeof(sectHdr), fp);
-	//printf("Section Header offset : 0x%lu\n", sectHdr.offset);
-	
-	// Lets copy the section names over to char array
-	sectionNames = malloc(sectHdr.size);
-	fseek(fp, sectHdr.offset, SEEK_SET);
-	fread(sectionNames, 1, sectHdr.size, fp);
-	
-	// Loop for sections
-	for(idx = 0; idx < myHeader.shnum; idx++)
-	{
-		const char *name = "";
-		// Copy Sections in to Section Struct
-		fseek(fp, myHeader.shoff + idx * sizeof(sectHdr), SEEK_SET);
-		fread(&sectHdr, 1, sizeof(sectHdr), fp);
-		if(sectHdr.name)
-		{
-				name = sectionNames + sectHdr.name;
-		}
-		
-		printf("Elf [%d] Section : %s\n", idx, name);
-	}
-	
-	
-	// Keep a copy of the original elf
-	fseek(fp, 0, SEEK_END);
-	long elfSize = ftell(fp);
-	//printf("Elf Size : %ld\n\n", elfSize);
-	fseek(fp, 0, SEEK_SET);
-	returnElf.buffer = malloc(elfSize + 1);
-	fread(returnElf.buffer, elfSize, 1, fp);
-	
-	
-	fclose(fp);
-	
-	returnElf.header = myHeader;
-	//returnElf.pheader = myPHeader;
-	
-	
-	return returnElf;
-}
 
-
+/*
+	OLD FUNCTIONS FROM BEFORE REFACTOR
 int verifyElf(OpenElf *inputElf)
 {
 	if(inputElf->buffer[0] == 0x7f && inputElf->buffer[1] == 'E' && inputElf->buffer[2] == 'L' && inputElf->buffer[3] == 'F')
@@ -124,3 +61,4 @@ void verboseElf(OpenElf inputElf)
 	printf("align:\t\t\t\t\t%lu\n", inputElf.pheader.align);
 	printf("============================================================\n");
 }
+*/

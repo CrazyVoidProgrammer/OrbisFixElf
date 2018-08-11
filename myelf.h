@@ -2,6 +2,8 @@
 #define _MYELF_H_
 
 #include <stdint.h>
+#include <stdbool.h>
+#include "varray.h"
 
 // Sony Shit 
 
@@ -59,147 +61,14 @@
 // MAGICS
 
 #define SCEPROCPARAMS_MAGIC 0x4942524F // 'ORBI'
+#define ORBIS_COMMENT_MAGIC 0x48544150 // 'PATH' - 0x48544150
 
 
-typedef struct OrbisElf_s *OrbisElfHandle_t;
-typedef struct OrbisElfProgram_s *OrbisElfProgramHandle_t;
-typedef struct OrbisElfSection_s *OrbisElfSectionHandle_t;
-
-
-typedef struct
-{
-	uint8_t magic[4];
-	uint8_t eclass;
-	uint8_t data;
-	uint8_t eversion;
-	uint8_t osabi;
-	uint8_t abiver;
-	uint8_t pad[7];
-	uint16_t type; /* See OrbisElfType_t */
-	uint16_t machine;
-	uint32_t version;
-	uint64_t entry;
-	uint64_t phoff;
-	uint64_t shoff;
-	uint32_t flags;
-	uint16_t ehsize;
-	uint16_t phentsize;
-	uint16_t phnum;
-	uint16_t shentsize;
-	uint16_t shnum;
-	uint16_t shstrndx;
-} OrbisElfHeader_t;
-
-typedef struct
-{
-	uint32_t type; /* see OrbisElfProgramType_t */
-	uint32_t flags;
-	uint64_t offset;
-	uint64_t vaddr;
-	uint64_t paddr;
-	uint64_t filesz;
-	uint64_t memsz;
-	uint64_t align;
-} OrbisElfProgramHeader_t;
-
-typedef struct
-{
-	uint32_t name;
-	uint32_t type; /* see OrbisElfSectionType_t */
-	uint64_t flags;
-	uint64_t addr;
-	uint64_t offset;
-	uint64_t size;
-	uint32_t link;
-	uint32_t info;
-	uint64_t addralign;
-	uint64_t entsize;
-} OrbisElfSectionHeader_t;
-
-typedef struct
-{
-	uint32_t name;
-	uint8_t info;
-	uint8_t other;
-	uint16_t shndx;
-	uint64_t value;
-	uint64_t size;
-} OrbisElfSymbolHeader_t;
-
-typedef struct
-{
-	uint64_t offset;
-	uint64_t info;
-} OrbisElfRelocation_t;
-
-typedef struct
-{
-	uint64_t offset;
-	uint64_t info;
-	int64_t addend;
-} OrbisElfRelocationWithAddend_t;
-
-typedef struct
-{
-	int64_t type; /* See OrbisElfDynamicType_t */
-	uint64_t value;
-} OrbisElfDynamic_t;
-
-
-typedef struct OrbisElfLibraryInfo_s
-{
-	uint16_t version;
-	uint16_t id;
-	const char *name;
-	uint32_t attr;
-} OrbisElfLibraryInfo_t;
-
-typedef struct OrbisElfModuleInfo_s
-{
-	uint16_t version;
-	uint16_t id;
-	const char *name;
-	uint64_t attr;
-} OrbisElfModuleInfo_t;
-
-/*
-typedef struct OrbisElfSymbol_s
-{
-	OrbisElfSymbolHeader_t header;
-	const char *name;
-	const OrbisElfModuleInfo_t *module;
-	const OrbisElfLibraryInfo_t *library;
-	enum OrbisElfSymbolBind_t bind;
-	enum OrbisElfSymbolType_t type;
-	uint64_t virtualBaseAddress;
-	void *baseAddress;
-} OrbisElfSymbol_t;
-*/
-
-typedef struct OrbisElfImport_s
-{
-	uint64_t offset;
-	int64_t addend;
-	uint32_t symbolIndex;
-	uint32_t relType; /* see OrbisElfRelocationType_t */
-} OrbisElfImport_t;
-
-typedef struct OrbisElfRebase_s
-{
-	uint64_t offset;
-	uint64_t value;
-	uint32_t symbolIndex;
-} OrbisElfRebase_t;
-
-// Orbis Reversed Sections 
-
-typedef struct orbis_special {
-	void *test;
-} orbis_special;
 
 // Orbis Process Param aka sce_process_param
 // Things need more reversing to figure out how this data is used.
-struct orbis_process_param
+/*
+typedef struct orbis_process_param
 {
     uint64_t Size;
     union
@@ -210,10 +79,28 @@ struct orbis_process_param
     uint32_t ThingCount;    // 1
     uint16_t SDK_Build;         // SDK Build Version : 0x0000
     uint8_t SDK_Minor;          // SDK Minor Version : 0x00
-    uint8_t SDK Major;          // SDK Major Version : 0x01
-    uint8_t Unknown[36];	// Most likely just padding...
-    uint64_t Things[];       // Things[ThingCount]; (gta is 0) but normally 2
-};
+    uint8_t SDK_Major;          // SDK Major Version : 0x01
+	uint32_t pad[11];
+//    uint8_t Unknown[36];	// Most likely just padding...
+//    uint64_t Things[1];       // Things[ThingCount]; (gta is 0) but normally 2
+} orbis_process_param;
+*/
+
+typedef struct orbis_process_param
+{
+    uint64_t Size;
+	uint32_t Magic; // 'ORBI'
+    uint32_t ThingCount;    // 1
+    uint16_t SDK_Build;         // SDK Build Version : 0x0000
+    uint8_t SDK_Minor;          // SDK Minor Version : 0x00
+    uint8_t SDK_Major;          // SDK Major Version : 0x01
+	uint32_t pad[11];
+} orbis_process_param;
+
+// Orbis Comment Section 
+
+
+#define CM_MAXSIZE 60
 
 struct orbis_comment_entry
 {
@@ -223,55 +110,87 @@ struct orbis_comment_entry
 
 struct orbis_comment
 {
-    uint32_t PathMagic;
+    uint32_t Magic;
+	uint32_t OtherSize; // Sizeof(OtherSize + EntrySize + Entry[])
     uint32_t EntrySize; // Total entry size with padding to 4 byte alignment
-    struct orbis_comment_entry Entry;
+    //struct orbis_comment_entry Entry;
+	//char path[CM_MAXSIZE];
+	char *path;
+	uint32_t pad;
 };
 
-struct dynlibHeader
-{
-	uint64_t unknown_header_section_01;
-	uint64_t unknown_header_section_02;
-	uint32_t unknown_header_section_03;
-}
+// orbis_version padding 0x20 
 
-struct prxFiles
+struct orbis_version_entry
+{
+	char *section_name; // example ".sceversion:."
+	uint8_t snPad; // 0x20
+	uint32_t unknown_vs_one; // "0000"
+	uint8_t vs_one_Pad; // 0x20
+	uint64_t unknown_vs_two; // "09637274"
+	uint8_t vs_two_Pad; // 0x20
+	uint64_t unknown_vs_three; // "313a0175"
+	uint8_t vs_three_Pad; // 0x20
+	uint64_t unknown_vs_four; // "00610963"
+	uint8_t vs_four_Pad; // 0x20
+	uint64_t unknown_vs_five; // "7274693a"
+	uint16_t vs_five_Pad; // 0x2020
+};
+
+struct orbis_version
+{
+	char *elfName; // example .hello.elf
+	uint32_t elfPad;
+	uint8_t elfPad2;
+	char elfType[18]; // "file format elf64-x86-64"
+	char elfSecPrefix[15]; // "..Contents of section"
+	uint8_t elfSecPrefixPad;
+	struct orbis_version_entry ovEntrys[10];
+};
+
+// Its 20 bytes on 1.76 and 16 bytes on 4.50 -> sce_fingerprint
+// Flatz suggest looking at orbis-bin and or publishing tools
+typedef struct sce_fingerprint
+{
+	char *fingerprint;
+} sce_fingerprint;
+
+typedef struct prxFiles
 {
 	char *prxFileName; // example : libc.prx libkernel.prx
 	uint8_t pad; // example : 0x00 (1 byte)
-};
+} prxFiles;
 
-struct moduleName
+typedef struct moduleName
 {
 	char *moduleName; // example : libc libkernel
 	uint8_t pad; // example : 0x00 (1 byte)
-}
+} moduleName;
 
-struct nidEntry
+typedef struct nidEntry
 {
-	char nid[11]
+	char nid[11];
 	char moduleIndex[4];
-	char pad; // 0x00 - 1 byte
-};
+	uint8_t pad; // 0x00 - 1 byte
+} nidEntry;
 
 typedef struct orbis_dynlib {
 
-	dynlibHeader header;
+	sce_fingerprint fingerprint;
 	
-	prxFiles prxFileList[];
-	moduleName moduleNameList[];	
+	prxFiles *prxFileList;
+	moduleName moduleNameList;	
 
 	char *elfBuildPath; // original build path of elf
 	uint8_t pad_01; // 1 byte of 0x00 padding	
 
-	nidEntry nidEntryList[];
+	nidEntry nidEntryList;
 
+	// SOME PADDING 
+	
+	// Prx Data?
+	
 } orbis_dynlib;
-
-
-typedef struct orbis_version {
-	void *test;
-} orbis_version;
 
 // Open Source SDK Stubs
 
@@ -298,11 +217,12 @@ typedef struct OrbisSection {
 
 typedef struct OpenElf {
 	char *buffer;
-	OrbisElfHeader_t header;
-	OrbisElfProgramHeader_t pheader;
+	//OrbisElfHeader_t header;
+	//OrbisElfProgramHeader_t pheader;
 	customStub stubs[];
 } OpenElf;
 
+/*
 // Add all sections to this
 typedef struct
 {
@@ -312,16 +232,126 @@ typedef struct
 	// Orbis Custom Sections
 	orbis_special *special;
 	orbis_process_param *process_param;
-	orbis_version *version;
+	struct orbis_version *version;
 	int errorCode;
 } OrbisElf;
+*/
 
-// Functions
+// IMPORT STUFF FROM VITA SDK 
 
-void verboseElf(OpenElf inputElf);
 
-int verifyElf(OpenElf *inputElf);
+typedef struct {
+	char *name;
+	uint32_t NID;
+} orbis_imports_common_fields;
 
-OpenElf loadElf(char *elfPath);
+typedef struct {
+	char *name;
+	uint32_t NID;
+} orbis_imports_stub_t;
+
+typedef struct {
+	char *name;
+	uint32_t NID;
+	bool is_kernel;
+	orbis_imports_stub_t **functions;
+	orbis_imports_stub_t **variables;
+	int n_functions;
+	int v_variables;
+	uint32_t flags;
+} orbis_imports_module_t;
+
+typedef struct {
+	char *name;
+	uint32_t NID;
+	orbis_imports_module_t **modules;
+	int n_modules;
+} orbis_imports_lib_t;
+
+typedef struct {
+	orbis_imports_lib_t **libs;
+	int n_libs;
+} orbis_imports_t;
+
+// STRUCTS FROM VITA SDK
+typedef struct orbis_elf_symbol_t {
+	const char *name;
+	const char *moduleIndex;
+	Elf32_Addr value;
+	uint8_t type;
+	uint8_t binding;
+	int shndx;
+} orbis_elf_symbol_t;
+
+typedef struct orbis_elf_rela_t {
+	uint8_t type;
+	orbis_elf_symbol_t *symbol;
+	Elf32_Addr offset;
+	Elf32_Sword addend;
+} orbis_elf_rela_t;
+
+typedef struct orbis_elf_rela_table_t {
+	orbis_elf_rela_t *relas;
+	int num_relas;
+	int target_ndx;
+	struct orbis_elf_rela_table_t *next;
+} orbis_elf_rela_table_t;
+
+typedef struct orbis_elf_stub_t {
+	Elf32_Addr addr;
+	uint32_t module_nid;
+	uint32_t target_nid;
+	
+	orbis_elf_symbol_t *symbol;
+	
+	orbis_imports_module_t *module;
+	orbis_imports_stub_t *target;
+} orbis_elf_stub_t;
+
+
+
+
+typedef struct orbis_elf_segment_info_t {
+	Elf32_Word type;	/* Segment type */
+	Elf32_Addr vaddr;	/* Top of segment space on TARGET */
+	Elf32_Word memsz;	/* Size of segment space */
+
+	/* vaddr_top/vaddr_bottom point to a reserved, unallocated memory space that
+	 * represents the segment space in the HOST.  This space can be used as
+	 * pointer targets for translated data structures. */
+	 
+	const void *vaddr_top;
+	const void *vaddr_bottom;
+} orbis_elf_segment_info_t;
+
+typedef struct OrbisElf
+{
+	int fd;
+	int mode;
+	Elf *elfData;
+
+	varray fstubs_va;
+	varray vstubs_va;
+	
+	int symtab_ndx;
+	orbis_elf_symbol_t *symtab;
+	int num_symbols;
+
+	orbis_elf_rela_table_t *rela_tables;
+	
+	orbis_elf_stub_t *fstubs;
+	orbis_elf_stub_t *vstubs;
+	int num_fstubs;
+	int num_vstubs;
+	
+	orbis_elf_segment_info_t *segments;
+	int num_segments;
+} OrbisElf;
+
+// OLD Functions from before Refactor
+//void verboseElf(OpenElf inputElf);
+//int verifyElf(OpenElf *inputElf);
+
+
 
 #endif
