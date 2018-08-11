@@ -32,6 +32,35 @@ void dump_args(int argc, char *argv[])
 	}
 }
 
+int simpleHexDump(const void *data)
+{
+	size_t size = sizeof(data);
+	unsigned char *d = (unsigned char *)data;
+	size_t consoleSize = 16;
+	char b[consoleSize + 3];
+	size_t i;
+
+	if(data == NULL){
+		return -1;
+		}
+	b[0] = '|';
+	b[consoleSize + 1] = '|';
+	b[consoleSize + 2] = '\0';
+
+	for (i = 0; i < size; i++)
+	{
+		if ((i % consoleSize) == 0)
+		{
+			if (i != 0){
+				printf("  %s\n", b);
+				}
+			printf("%16s ", (unsigned char *)data + i);
+		}
+  }
+
+	return 0;
+}
+
 // HexDump ripped from Wildcard Kernel Dumper
 // Thanks WildCard
 int hexDump(const void *data)

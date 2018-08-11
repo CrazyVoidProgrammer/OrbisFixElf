@@ -142,14 +142,16 @@ int main(int argc, char **argv)
 								{
 									// Get elf data
 									Elf_Data *custom_stub_sdat = elf_rawdata(ee_scn, NULL);
-									// ->d_buf is the raw data
-									
-									
+						
+									// Add info to varray 
 									int ndxscn = elf_ndxscn(ee_scn);
 									varray_push(&importElf.fstubs_va, &ndxscn);
 									
-									
+									// Lets dump to console our stub
 									printf("CUSTOM STUB : %s - Size : %lu - Offset : %lu\n", name, ee_shdr.sh_size, ee_shdr.sh_offset);
+									simpleHexDump(custom_stub_sdat->d_buf);
+									
+									// Increase cs count
 									cs_count++;
 								}
 								else

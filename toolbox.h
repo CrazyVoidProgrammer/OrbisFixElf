@@ -31,6 +31,7 @@
 // Util Functions
 void print_help_section();
 void dump_args(int argc, char *argv[]);
+int simpleHexDump(const void *data);
 int hexDump(const void *data);
 
 // Elf Editing Functions
