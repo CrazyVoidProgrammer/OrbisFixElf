@@ -140,15 +140,14 @@ int main(int argc, char **argv)
 
 								if(ee_shdr.sh_type == SHT_PROGBITS && strncmp(name, ".orbislink.fstubs", strlen(".orbislink.fstubs")) == 0)
 								{
+									// Get elf data
+									Elf_Data *custom_stub_sdat = elf_rawdata(ee_scn, NULL);
+									// ->d_buf is the raw data
+									
+									
 									int ndxscn = elf_ndxscn(ee_scn);
 									varray_push(&importElf.fstubs_va, &ndxscn);
 									
-									/*
-									if(load_stubs(ee_scn, &exportElf.num_fstubs, &exportElf.fstubs, name) == 1)
-									{
-										cv_count++;
-									}
-									*/
 									
 									printf("CUSTOM STUB : %s - Size : %lu - Offset : %lu\n", name, ee_shdr.sh_size, ee_shdr.sh_offset);
 									cs_count++;
