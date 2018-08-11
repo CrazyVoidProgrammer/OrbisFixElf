@@ -34,4 +34,3 @@ and the attributes
 ##### Thanks 
 - flatz
 - kiwidog
-- frangarcj
