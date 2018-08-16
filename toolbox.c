@@ -229,6 +229,9 @@ Elf_Scn *orb_create_section(OrbisElf *inputElf, const char *name, void *scnData,
 		
 		shdr.sh_name = shstrtab_shdr.sh_size;
 		shstrtab_shdr.sh_size += shstrtab_data->d_size;
+
+		// cleanup
+		free(shstrtab_data->d_buf), shstrtab_data->d_buf = NULL;
 		
 		if(!gelf_update_shdr(new_scn, &shdr))
 		{

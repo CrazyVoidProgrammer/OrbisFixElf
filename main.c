@@ -191,9 +191,10 @@ int main(int argc, char **argv)
 						// CREATE SCE COMMENT SECTION 
 						Elf_Scn *testScn = orb_create_section(&importElf, ".sce_comment", oelf_comment_section, (size_t)projected_size_of_section);
 						
-
-						
-
+						// cleanup
+						if(oelf_comment_section) free(oelf_comment_section), oelf_comment_section = NULL;
+						varray_destroy(&importElf.fstubs_va);
+						varray_destroy(&importElf.vstubs_va);
 					}
 					else
 					{
