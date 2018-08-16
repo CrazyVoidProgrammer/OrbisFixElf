@@ -116,7 +116,7 @@ struct orbis_comment generate_sce_comment(char *path)
 void *consolidate_orbis_comment(struct orbis_comment ioc)
 {
 	int size_of_path = strlen(ioc.path);
-	int projected_size = (size_of_path + 16);
+	int projected_size = (size_of_path + 16 + 1);
 	int current_size;
 	
 	void *tempBuff = malloc(projected_size);
