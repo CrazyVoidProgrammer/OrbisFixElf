@@ -1,4 +1,4 @@
-COMPILER= clang-5.0
+COMPILER= clang
 OUTPUTEXEC= orbisFixElf
 SOURCE_FILES= main.c myelf.c toolbox.c logger.c dyngen.c varray.c
 CFLAGS= -l elf -o
